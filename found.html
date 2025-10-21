@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FindIt — Found</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">FindIt</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <nav class="nav">
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="lost.html" class="nav-link">Lost</a>
+        <a href="found.html" class="nav-link active">Found</a>
+        <a href="index.html" class="nav-link">Logout</a>
+      </nav>
+
+      <div class="spaced">
+        <button class="btn wide" id="addFoundBtn">+ Add Found</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h1>Found Items</h1>
+          <p class="muted">Items marked as found</p>
+        </div>
+        <div class="search-row">
+          <input id="searchFound" placeholder="Search found items..." />
+          <button class="btn" id="clearSearchFound">Clear</button>
+        </div>
+
+        <div id="claimModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <button type="button" id="closeClaimModal" class="close-btn">×</button>
+    <h2>Claim Item</h2>
+    <form id="claimForm">
+      <p class="muted">Please upload a proof (e.g., Amazon bill or screenshot) to claim this item.</p>
+      <input type="file" id="claimImage" accept="image/*" required />
+      <div id="claimImagePreview" class="muted">No image uploaded</div>
+      <div class="modal-actions">
+        <button type="submit" class="btn">Submit Claim</button>
+        <button type="button" id="cancelClaim" class="btn outline">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+      </div>
+
+      <section class="content-grid" id="foundGridOnly"></section>
+
+      <footer class="footer">
+        <div>© FindIt — Demo prototype</div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ✅ Modal for Adding Found Item -->
+  <div id="addModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <!-- ❌ Close button -->
+      <button type="button" id="closeModal" class="close-btn">×</button>
+
+      <h2>Add Found Item</h2>
+      <form id="addForm">
+        <input type="text" id="itemTitle" placeholder="Item title" required />
+        <input type="text" id="itemPlace" placeholder="Place found" required />
+        <input type="date" id="itemDate" required />
+        <textarea id="itemDesc" placeholder="Description"></textarea>
+        <input type="text" id="posterName" placeholder="Your name" required />
+        <input type="text" id="posterContact" placeholder="Contact info" required />
+
+        <div>
+          <label>Image:</label>
+          <input type="file" id="itemImage" accept="image/*" />
+          <div id="imagePreview" class="muted">No image</div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn">Save</button>
+          <button type="button" id="cancelAdd" class="btn outline">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  initApp();
+  renderFoundOnly();
+  setupSearch('searchFound', 'clearSearchFound', renderFoundOnly, 'Found');
+
+  const addModal = document.getElementById("addModal");
+  const claimModal = document.getElementById("claimModal");
+
+  const addFoundBtn = document.getElementById("addFoundBtn");
+  const closeAddModal = document.getElementById("closeModal");
+  const cancelAdd = document.getElementById("cancelAdd");
+
+  const closeClaimModal = document.getElementById("closeClaimModal");
+  const cancelClaim = document.getElementById("cancelClaim");
+  const claimForm = document.getElementById("claimForm");
+  const claimImage = document.getElementById("claimImage");
+  const claimImagePreview = document.getElementById("claimImagePreview");
+
+  // ✅ Open Add modal
+  addFoundBtn.addEventListener("click", () => addModal.setAttribute("aria-hidden", "false"));
+  closeAddModal.addEventListener("click", () => addModal.setAttribute("aria-hidden", "true"));
+  cancelAdd.addEventListener("click", () => addModal.setAttribute("aria-hidden", "true"));
+
+  // ✅ Add "Claim" button to each found item dynamically
+  const grid = document.getElementById("foundGridOnly");
+  const observer = new MutationObserver(() => {
+    grid.querySelectorAll(".claim-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        claimModal.setAttribute("aria-hidden", "false");
+      });
+    });
+  });
+  observer.observe(grid, { childList: true, subtree: true });
+
+  // ✅ Close Claim Modal
+  closeClaimModal.addEventListener("click", () => claimModal.setAttribute("aria-hidden", "true"));
+  cancelClaim.addEventListener("click", () => claimModal.setAttribute("aria-hidden", "true"));
+
+  // ✅ Image Preview in Claim Modal
+  claimImage.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => claimImagePreview.innerHTML = `<img src="${reader.result}" style="max-width:100%; border-radius:8px;">`;
+      reader.readAsDataURL(file);
+    } else {
+      claimImagePreview.textContent = "No image uploaded";
+    }
+  });
+
+  // ✅ Submit Claim Form
+  claimForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    claimModal.setAttribute("aria-hidden", "true");
+    alert("✅ Claim submitted successfully! The team will verify your proof shortly.");
+    claimForm.reset();
+    claimImagePreview.textContent = "No image uploaded";
+  });
+});
+    document.addEventListener("DOMContentLoaded", () => {
+      initApp();
+      renderFoundOnly();
+      setupSearch('searchFound', 'clearSearchFound', renderFoundOnly, 'Found');
+
+      const modal = document.getElementById("addModal");
+      const addFoundBtn = document.getElementById("addFoundBtn");
+      const closeModalBtn = document.getElementById("closeModal");
+      const cancelBtn = document.getElementById("cancelAdd");
+
+      // ✅ Open modal
+      addFoundBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "false");
+      });
+
+      // ✅ Close modal on cross or cancel
+      closeModalBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "true");
+      });
+      cancelBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "true");
+      });
+
+      // ✅ Optional: Close when clicking outside
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.setAttribute("aria-hidden", "true");
+      });
+    });
+
+    
+  </script>
+
+  <style>
+    /* ✅ Close Button Style */
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #555;
+    }
+    .close-btn:hover {
+      color: red;
+    }
+
+    /* ✅ Modal visibility */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+    .modal-content {
+      position: relative;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .claim-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+.claim-btn:hover {
+  background-color: #0056b3;
+}
+  </style>
+</body>
+</html>
