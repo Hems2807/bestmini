@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FindIt — Lost</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">FindIt</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <nav class="nav">
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="lost.html" class="nav-link active">Lost</a>
+        <a href="found.html" class="nav-link">Found</a>
+        <a href="index.html" class="nav-link">Logout</a>
+      </nav>
+
+      <div class="spaced">
+        <button class="btn wide" id="addLostBtn">+ Add Lost</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h1>Lost Items</h1>
+          <p class="muted">Items marked as lost</p>
+        </div>
+        <div class="search-row">
+          <input id="searchLost" placeholder="Search lost items..." />
+          <button class="btn" id="clearSearchLost">Clear</button>
+        </div>
+      </div>
+
+      <section class="content-grid" id="lostGridOnly"></section>
+
+      <footer class="footer">
+        <div>© FindIt — Demo prototype</div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ✅ Modal for Adding Lost Item -->
+  <div id="addModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <!-- ❌ Close button -->
+      <button type="button" id="closeModal" class="close-btn">×</button>
+
+      <h2>Add Lost Item</h2>
+      <form id="addForm">
+        <input type="text" id="itemTitle" placeholder="Item title" required />
+        <input type="text" id="itemPlace" placeholder="Place" required />
+        <input type="date" id="itemDate" required />
+        <textarea id="itemDesc" placeholder="Description"></textarea>
+        <input type="text" id="posterName" placeholder="Your name" required />
+        <input type="text" id="posterContact" placeholder="Contact info" required />
+
+        <div>
+          <label>Image:</label>
+          <input type="file" id="itemImage" accept="image/*" />
+          <div id="imagePreview" class="muted">No image</div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn">Save</button>
+          <button type="button" id="cancelAdd" class="btn outline">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      initApp();
+      renderLostOnly();
+      setupSearch('searchLost', 'clearSearchLost', renderLostOnly, 'Lost');
+
+      const modal = document.getElementById("addModal");
+      const addLostBtn = document.getElementById("addLostBtn");
+      const closeModalBtn = document.getElementById("closeModal");
+      const cancelBtn = document.getElementById("cancelAdd");
+
+      // ✅ Open modal
+      addLostBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "false");
+      });
+
+      // ✅ Close modal on cross or cancel
+      closeModalBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "true");
+      });
+      cancelBtn.addEventListener("click", () => {
+        modal.setAttribute("aria-hidden", "true");
+      });
+
+      // ✅ Optional: Close when clicking outside content
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.setAttribute("aria-hidden", "true");
+      });
+    });
+  </script>
+
+  <style>
+    /* ✅ Close Button Style */
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #555;
+    }
+    .close-btn:hover {
+      color: red;
+    }
+
+    /* ✅ Modal visibility */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+    .modal-content {
+      position: relative;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+    }
+  </style>
+</body>
+</html>
